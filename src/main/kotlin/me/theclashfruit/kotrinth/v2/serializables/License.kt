@@ -6,5 +6,5 @@ import kotlinx.serialization.Serializable
 data class License(
     val id: String,
     val name: String,
-    val url: String
+    val url: String? = null
 )
