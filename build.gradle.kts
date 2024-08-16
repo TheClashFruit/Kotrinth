@@ -37,6 +37,10 @@ kotlin {
     jvmToolchain(17)
 }
 
+java {
+    withSourcesJar()
+}
+
 buildscript {
     dependencies {
         classpath("org.jetbrains.dokka:dokka-base:1.9.20")
@@ -95,6 +99,7 @@ publishing {
             from(components["kotlin"])
 
             artifact(javadocJar)
+            artifact(tasks.getByName("sourcesJar"))
 
             pom {
                 name.set("Kotrinth")

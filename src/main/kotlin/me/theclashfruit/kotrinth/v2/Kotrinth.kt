@@ -15,6 +15,7 @@ import me.theclashfruit.kotrinth.enums.Sort
 import me.theclashfruit.kotrinth.utils.ApiError
 import me.theclashfruit.kotrinth.v2.serializables.Project
 import me.theclashfruit.kotrinth.v2.serializables.Search
+import org.jetbrains.annotations.ApiStatus.Internal
 import kotlin.io.use
 
 /**
@@ -149,6 +150,12 @@ class Kotrinth(appName: String, appVersion: String, appContact: String, customUs
         return res
     }
 
+    /**
+     * Test the configuration of the client.
+     *
+     * For testing if client is configured correctly.
+     */
+    @Internal
     suspend fun testConfig() {
         val response: HttpResponse = client.get("http://localhost:3000/")
         val res: String = response.body()
