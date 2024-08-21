@@ -15,6 +15,7 @@ import me.theclashfruit.kotrinth.enums.Sort
 import me.theclashfruit.kotrinth.utils.ApiError
 import me.theclashfruit.kotrinth.v2.serializables.Project
 import me.theclashfruit.kotrinth.v2.serializables.Search
+import me.theclashfruit.kotrinth.v2.serializables.User
 import org.jetbrains.annotations.ApiStatus.Internal
 import kotlin.io.use
 
@@ -119,7 +120,7 @@ class Kotrinth(appName: String, appVersion: String, appContact: String, customUs
     }
 
     /**
-     * Get a project by its id.
+     * Get a project by slug or id.
      *
      * @param id|slug The id of the project.
      *
@@ -151,6 +152,42 @@ class Kotrinth(appName: String, appVersion: String, appContact: String, customUs
     }
 
     /**
+     * Get a user by username or id.
+     *
+     * @return [me.theclashfruit.kotrinth.v2.serializables.User]
+     */
+    suspend fun user(): User? {
+        val response: HttpResponse = client.get("$modrinthUrl/user") {
+            headers {
+                if (token != null) {
+                    header("Authorization", token)
+                }
+            }
+        }
+
+        return parseUser(response)
+    }
+
+    /**
+     * Get the authenticated user.
+     *
+     * @param id|username The id of the user.
+     *
+     * @return [me.theclashfruit.kotrinth.v2.serializables.User]
+     */
+    suspend fun user(id: String): User? {
+        val response: HttpResponse = client.get("$modrinthUrl/user/$id") {
+            headers {
+                if (token != null) {
+                    header("Authorization", token)
+                }
+            }
+        }
+
+        return parseUser(response)
+    }
+
+    /**
      * Test the configuration of the client.
      *
      * For testing if client is configured correctly.
@@ -161,6 +198,22 @@ class Kotrinth(appName: String, appVersion: String, appContact: String, customUs
         val res: String = response.body()
 
         println(res)
+    }
+
+    private suspend fun parseUser(response: HttpResponse): User? {
+        setRateLimits(response)
+
+        if (response.status == HttpStatusCode.Unauthorized) return null
+
+        if (response.status != HttpStatusCode.OK) {
+            val res: ApiError = response.body()
+
+            throw ApiException(res)
+        }
+
+        val res: User = response.body()
+
+        return res
     }
 
     private fun setRateLimits(response: HttpResponse) {

@@ -5,11 +5,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class ProjectType(private val value: String) {
-    @SerialName("project")      PROJECT("project"), // couldn't have been like "unknown" or something smh
-    @SerialName("mod")          MOD("mod"),
-    @SerialName("modpack")      MODPACK("modpack"),
-    @SerialName("resourcepack") RESOURCEPACK("resourcepack"),
-    @SerialName("shader")       SHADER("shader");
+    @SerialName("project")      Project("project"), // couldn't have been like "unknown" or something smh
+    @SerialName("mod")          Mod("mod"),
+    @SerialName("modpack")      ModPack("modpack"),
+    @SerialName("resourcepack") ResourcePack("resourcepack"),
+    @SerialName("shader")       Shader("shader");
 
     override fun toString(): String {
         return value

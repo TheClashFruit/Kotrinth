@@ -5,10 +5,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class Side(private val value: String) {
-    @SerialName("required")    REQUIRED("required"),
-    @SerialName("optional")    OPTIONAL("optional"),
-    @SerialName("unsupported") UNSUPPORTED("unsupported"),
-    @SerialName("unknown")     UNKNOWN("unknown");
+    @SerialName("required")    Required("required"),
+    @SerialName("optional")    Optional("optional"),
+    @SerialName("unsupported") Unsupported("unsupported"),
+    @SerialName("unknown")     Unknown("unknown");
 
     override fun toString(): String {
         return value

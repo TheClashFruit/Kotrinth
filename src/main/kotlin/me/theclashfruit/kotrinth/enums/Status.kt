@@ -5,16 +5,16 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 enum class Status(private val value: String) {
-    @SerialName("approved")   APPROVED("approved"),
-    @SerialName("archived")   ARCHIVED("archived"),
-    @SerialName("rejected")   REJECTED("rejected"),
-    @SerialName("draft")      DRAFT("draft"),
-    @SerialName("unlisted")   UNLISTED("unlisted"),
-    @SerialName("processing") PROCESSING("processing"),
-    @SerialName("withheld")   WITHHELD("withheld"),
-    @SerialName("scheduled")  SCHEDULED("scheduled"),
-    @SerialName("private")    PRIVATE("private"),
-    @SerialName("unknown")    UNKNOWN("unknown");
+    @SerialName("approved")   Approved("approved"),
+    @SerialName("archived")   Archived("archived"),
+    @SerialName("rejected")   Rejected("rejected"),
+    @SerialName("draft")      Draft("draft"),
+    @SerialName("unlisted")   Unlisted("unlisted"),
+    @SerialName("processing") Processing("processing"),
+    @SerialName("withheld")   Withheld("withheld"),
+    @SerialName("scheduled")  Scheduled("scheduled"),
+    @SerialName("private")    Private("private"),
+    @SerialName("unknown")    Unknown("unknown");
 
     override fun toString(): String {
         return value
