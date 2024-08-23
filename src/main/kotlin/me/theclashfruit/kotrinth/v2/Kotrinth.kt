@@ -11,12 +11,14 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.util.*
 import io.ktor.utils.io.core.*
+import me.theclashfruit.kotrinth.enums.Method
 import me.theclashfruit.kotrinth.exceptions.ApiException
 import me.theclashfruit.kotrinth.enums.Sort
 import me.theclashfruit.kotrinth.utils.ApiError
 import me.theclashfruit.kotrinth.v2.serializables.Project
 import me.theclashfruit.kotrinth.v2.serializables.Search
 import me.theclashfruit.kotrinth.v2.serializables.User
+import org.jetbrains.annotations.ApiStatus.Experimental
 import org.jetbrains.annotations.ApiStatus.Internal
 import kotlin.io.use
 
@@ -82,8 +84,8 @@ class Kotrinth(appName: String, appVersion: String, appContact: String, customUs
      * @param offset The offset.
      * @param limit The limit.
      *
-     * @return [me.theclashfruit.kotrinth.data.Search]
-     * @throws [me.theclashfruit.kotrinth.ApiException]
+     * @return [me.theclashfruit.kotrinth.v2.serializables.Search]
+     * @throws [me.theclashfruit.kotrinth.utils.ApiError]
      */
     suspend fun search(query: String? = null, index: Sort? = null, offset: Int = 0, limit: Int = 10): Search {
         val response: HttpResponse = client.get("$modrinthUrl/search") {
@@ -125,7 +127,7 @@ class Kotrinth(appName: String, appVersion: String, appContact: String, customUs
      *
      * @param id|slug The id of the project.
      *
-     * @return [me.theclashfruit.kotrinth.v2.serializables.Project]
+     * @return [me.theclashfruit.kotrinth.v2.serializables.Project] or null if project not found.
      * @throws [me.theclashfruit.kotrinth.utils.ApiError]
      */
     suspend fun project(id: String): Project? {
@@ -155,7 +157,7 @@ class Kotrinth(appName: String, appVersion: String, appContact: String, customUs
     /**
      * Get the authenticated user.
      *
-     * @return [me.theclashfruit.kotrinth.v2.serializables.User]
+     * @return [me.theclashfruit.kotrinth.v2.serializables.User] or null if user not authenticated.
      */
     suspend fun user(): User? {
         val response: HttpResponse = client.get("$modrinthUrl/user") {
@@ -174,7 +176,7 @@ class Kotrinth(appName: String, appVersion: String, appContact: String, customUs
      *
      * @param id|username The id of the user.
      *
-     * @return [me.theclashfruit.kotrinth.v2.serializables.User]
+     * @return [me.theclashfruit.kotrinth.v2.serializables.User] or null if user not found.
      */
     suspend fun user(id: String): User? {
         val response: HttpResponse = client.get("$modrinthUrl/user/$id") {
@@ -193,9 +195,9 @@ class Kotrinth(appName: String, appVersion: String, appContact: String, customUs
      *
      * @param id|username The id of the user.
      *
-     * @return [kotlin.collections.List] of [me.theclashfruit.kotrinth.v2.serializables.Project]
+     * @return A list of [me.theclashfruit.kotrinth.v2.serializables.Project] or null if user not found.
      */
-    suspend fun userProjects(id: String): List<Project> {
+    suspend fun userProjects(id: String): List<Project>? {
         val response: HttpResponse = client.get("$modrinthUrl/user/$id/projects") {
             headers {
                 if (token != null) {
@@ -205,6 +207,8 @@ class Kotrinth(appName: String, appVersion: String, appContact: String, customUs
         }
 
         setRateLimits(response)
+
+        if (response.status == HttpStatusCode.NotFound) return null
 
         if (response.status != HttpStatusCode.OK) {
             val res: ApiError = response.body()
@@ -220,22 +224,28 @@ class Kotrinth(appName: String, appVersion: String, appContact: String, customUs
     /**
      * Custom request.
      *
-     * @param url The url to request.
+     * Example:
+     * `
+     * val response = kotrinth.customRequest(HttpMethod.Get, "/projects/fabric-api")
+     * `
+     *
      * @param method The method to use.
+     * @param path The path on the Modrinth api to request.
      * @param body The body to send.
      *
      * @return [io.ktor.client.statement.HttpResponse]
      */
+    @Experimental
     @OptIn(InternalAPI::class)
-    suspend fun customRequest(url: String, method: HttpMethod, body: String? = null): HttpResponse {
-        val response: HttpResponse = client.request(url) {
+    suspend fun customRequest(method: Method, path: String, body: String? = null): HttpResponse {
+        val response: HttpResponse = client.request("$modrinthUrl$path") {
             headers {
                 if (token != null) {
                     header("Authorization", token)
                 }
             }
 
-            this.method = method
+            this.method = method.value
 
             if (body != null) {
                 this.body = body
