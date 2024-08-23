@@ -152,7 +152,7 @@ class Kotrinth(appName: String, appVersion: String, appContact: String, customUs
     }
 
     /**
-     * Get a user by username or id.
+     * Get the authenticated user.
      *
      * @return [me.theclashfruit.kotrinth.v2.serializables.User]
      */
@@ -169,7 +169,7 @@ class Kotrinth(appName: String, appVersion: String, appContact: String, customUs
     }
 
     /**
-     * Get the authenticated user.
+     * Get a user by username or id.
      *
      * @param id|username The id of the user.
      *
