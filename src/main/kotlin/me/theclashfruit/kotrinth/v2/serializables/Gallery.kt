@@ -7,7 +7,7 @@ data class Gallery(
     val created: String,
     val description: String? = null,
     val featured: Boolean,
-    val ordering: Int,
+    val ordering: Long, // wtf modrinth why is this a 64-bit integer???
     val title: String? = null,
     val url: String
 )

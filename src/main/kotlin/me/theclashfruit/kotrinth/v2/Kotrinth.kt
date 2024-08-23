@@ -9,6 +9,7 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import io.ktor.util.*
 import io.ktor.utils.io.core.*
 import me.theclashfruit.kotrinth.exceptions.ApiException
 import me.theclashfruit.kotrinth.enums.Sort
@@ -185,6 +186,65 @@ class Kotrinth(appName: String, appVersion: String, appContact: String, customUs
         }
 
         return parseUser(response)
+    }
+
+    /**
+     * Get the projects of a user by username or id.
+     *
+     * @param id|username The id of the user.
+     *
+     * @return [kotlin.collections.List] of [me.theclashfruit.kotrinth.v2.serializables.Project]
+     */
+    suspend fun userProjects(id: String): List<Project> {
+        val response: HttpResponse = client.get("$modrinthUrl/user/$id/projects") {
+            headers {
+                if (token != null) {
+                    header("Authorization", token)
+                }
+            }
+        }
+
+        setRateLimits(response)
+
+        if (response.status != HttpStatusCode.OK) {
+            val res: ApiError = response.body()
+
+            throw ApiException(res)
+        }
+
+        val res: List<Project> = response.body()
+
+        return res
+    }
+
+    /**
+     * Custom request.
+     *
+     * @param url The url to request.
+     * @param method The method to use.
+     * @param body The body to send.
+     *
+     * @return [io.ktor.client.statement.HttpResponse]
+     */
+    @OptIn(InternalAPI::class)
+    suspend fun customRequest(url: String, method: HttpMethod, body: String? = null): HttpResponse {
+        val response: HttpResponse = client.request(url) {
+            headers {
+                if (token != null) {
+                    header("Authorization", token)
+                }
+            }
+
+            this.method = method
+
+            if (body != null) {
+                this.body = body
+            }
+        }
+
+        setRateLimits(response)
+
+        return response
     }
 
     /**
