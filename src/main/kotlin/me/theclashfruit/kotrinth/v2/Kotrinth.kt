@@ -158,6 +158,7 @@ class Kotrinth(appName: String, appVersion: String, appContact: String, customUs
      * Get the authenticated user.
      *
      * @return [me.theclashfruit.kotrinth.v2.serializables.User] or null if user not authenticated.
+     * @throws [me.theclashfruit.kotrinth.utils.ApiError]
      */
     suspend fun user(): User? {
         val response: HttpResponse = client.get("$modrinthUrl/user") {
@@ -177,6 +178,7 @@ class Kotrinth(appName: String, appVersion: String, appContact: String, customUs
      * @param id|username The id of the user.
      *
      * @return [me.theclashfruit.kotrinth.v2.serializables.User] or null if user not found.
+     * @throws [me.theclashfruit.kotrinth.utils.ApiError]
      */
     suspend fun user(id: String): User? {
         val response: HttpResponse = client.get("$modrinthUrl/user/$id") {
@@ -191,11 +193,44 @@ class Kotrinth(appName: String, appVersion: String, appContact: String, customUs
     }
 
     /**
+     * Get the projects of the authenticated user.
+     *
+     * @return A list of [me.theclashfruit.kotrinth.v2.serializables.Project] or null if user not authenticated.
+     * @throws [me.theclashfruit.kotrinth.utils.ApiError]
+     */
+    suspend fun userProjects(): List<Project>? {
+        val user = user() ?: return null
+
+        val response: HttpResponse = client.get("$modrinthUrl/user/${user.id}/projects") {
+            headers {
+                if (token != null) {
+                    header("Authorization", token)
+                }
+            }
+        }
+
+        setRateLimits(response)
+
+        if (response.status == HttpStatusCode.NotFound) return null
+
+        if (response.status != HttpStatusCode.OK) {
+            val res: ApiError = response.body()
+
+            throw ApiException(res)
+        }
+
+        val res: List<Project> = response.body()
+
+        return res
+    }
+
+    /**
      * Get the projects of a user by username or id.
      *
      * @param id|username The id of the user.
      *
      * @return A list of [me.theclashfruit.kotrinth.v2.serializables.Project] or null if user not found.
+     * @throws [me.theclashfruit.kotrinth.utils.ApiError]
      */
     suspend fun userProjects(id: String): List<Project>? {
         val response: HttpResponse = client.get("$modrinthUrl/user/$id/projects") {
@@ -222,11 +257,77 @@ class Kotrinth(appName: String, appVersion: String, appContact: String, customUs
     }
 
     /**
+     * Get the projects the authenticated user is following.
+     *
+     * @return A list of [me.theclashfruit.kotrinth.v2.serializables.Project] or null if user is not authorized.
+     * @throws [me.theclashfruit.kotrinth.utils.ApiError]
+     */
+    suspend fun userFollowedProjects(): List<Project>? {
+        val user = user() ?: return null
+
+        val response: HttpResponse = client.get("$modrinthUrl/user/${user.id}/follows") {
+            headers {
+                if (token != null) {
+                    header("Authorization", token)
+                }
+            }
+        }
+
+        setRateLimits(response)
+
+        if (response.status == HttpStatusCode.NotFound)     return null
+        if (response.status == HttpStatusCode.Unauthorized) return null
+
+        if (response.status != HttpStatusCode.OK) {
+            val res: ApiError = response.body()
+
+            throw ApiException(res)
+        }
+
+        val res: List<Project> = response.body()
+
+        return res
+    }
+
+    /**
+     * Get the projects a user is following by username or id.
+     *
+     * @param id|username The id of the user.
+     *
+     * @return A list of [me.theclashfruit.kotrinth.v2.serializables.Project] or null if user is not authorized.
+     * @throws [me.theclashfruit.kotrinth.utils.ApiError]
+     */
+    suspend fun userFollowedProjects(id: String): List<Project>? {
+        val response: HttpResponse = client.get("$modrinthUrl/user/$id/follows") {
+            headers {
+                if (token != null) {
+                    header("Authorization", token)
+                }
+            }
+        }
+
+        setRateLimits(response)
+
+        if (response.status == HttpStatusCode.NotFound)     return null
+        if (response.status == HttpStatusCode.Unauthorized) return null
+
+        if (response.status != HttpStatusCode.OK) {
+            val res: ApiError = response.body()
+
+            throw ApiException(res)
+        }
+
+        val res: List<Project> = response.body()
+
+        return res
+    }
+
+    /**
      * Custom request.
      *
      * Example:
      * `
-     * val response = kotrinth.customRequest(HttpMethod.Get, "/projects/fabric-api")
+     * val response = kotrinth.customRequest(Method.Get, "/projects/fabric-api")
      * `
      *
      * @param method The method to use.
@@ -234,6 +335,7 @@ class Kotrinth(appName: String, appVersion: String, appContact: String, customUs
      * @param body The body to send.
      *
      * @return [io.ktor.client.statement.HttpResponse]
+     * @throws [me.theclashfruit.kotrinth.utils.ApiError]
      */
     @Experimental
     @OptIn(InternalAPI::class)
@@ -253,6 +355,12 @@ class Kotrinth(appName: String, appVersion: String, appContact: String, customUs
         }
 
         setRateLimits(response)
+
+        if (response.status != HttpStatusCode.OK) {
+            val res: ApiError = response.body()
+
+            throw ApiException(res)
+        }
 
         return response
     }
