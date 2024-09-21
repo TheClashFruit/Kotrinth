@@ -193,6 +193,42 @@ class Kotrinth(appName: String, appVersion: String, appContact: String, customUs
     }
 
     /**
+     * Get multiple users by username or id.
+     *
+     * @param id|username The id of the user.
+     *
+     * @return [me.theclashfruit.kotrinth.v2.serializables.User] or null if user not found.
+     * @throws [me.theclashfruit.kotrinth.utils.ApiError]
+     */
+    suspend fun users(vararg id: String): List<User>? {
+        val response: HttpResponse = client.get("$modrinthUrl/users") {
+            headers {
+                if (token != null) {
+                    header("Authorization", token)
+                }
+            }
+
+            url {
+                parameters.append("ids", "[\"${id.joinToString("\",\"")}\"]")
+            }
+        }
+
+        setRateLimits(response)
+
+        if (response.status == HttpStatusCode.NotFound) return null
+
+        if (response.status != HttpStatusCode.OK) {
+            val res: ApiError = response.body()
+
+            throw ApiException(res)
+        }
+
+        val res: List<User> = response.body()
+
+        return res
+    }
+
+    /**
      * Get the projects of the authenticated user.
      *
      * @return A list of [me.theclashfruit.kotrinth.v2.serializables.Project] or null if user not authenticated.
