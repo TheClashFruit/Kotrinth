@@ -1,6 +1,7 @@
 import org.jetbrains.dokka.base.DokkaBase
 import org.jetbrains.dokka.base.DokkaBaseConfiguration
 import org.jetbrains.dokka.gradle.DokkaTask
+import java.io.ByteArrayOutputStream
 
 plugins {
     `maven-publish`
@@ -11,10 +12,21 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization") version "2.0.0"
 }
 
-val buildId = System.getenv("BUILD_ID") ?: System.currentTimeMillis().toString()
+val gitHash: String by lazy {
+    val stdout = ByteArrayOutputStream()
+
+    rootProject.exec {
+        commandLine("git", "rev-parse", "--short", "HEAD")
+
+        standardOutput = stdout
+    }
+
+    stdout.toString().trim()
+}
+
 
 group = "me.theclashfruit"
-version = "1.0.0+$buildId"
+version = "1.0.0+$gitHash"
 
 repositories {
     mavenCentral()
