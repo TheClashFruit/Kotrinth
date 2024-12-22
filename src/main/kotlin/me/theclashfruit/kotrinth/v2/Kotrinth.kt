@@ -12,6 +12,8 @@ import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.utils.io.*
 import me.theclashfruit.kotrinth.enums.Method
+import me.theclashfruit.kotrinth.enums.ProjectType
+import me.theclashfruit.kotrinth.enums.Side
 import me.theclashfruit.kotrinth.enums.Sort
 import me.theclashfruit.kotrinth.exceptions.ApiException
 import me.theclashfruit.kotrinth.utils.AndroidUtil.isRunningOnAndroid
@@ -19,6 +21,10 @@ import me.theclashfruit.kotrinth.utils.ApiError
 import me.theclashfruit.kotrinth.v2.serializables.Project
 import me.theclashfruit.kotrinth.v2.serializables.Search
 import me.theclashfruit.kotrinth.v2.serializables.User
+import me.theclashfruit.kotrinth.v2.serializables.tags.CategoryTag
+import me.theclashfruit.kotrinth.v2.serializables.tags.GameVersionTag
+import me.theclashfruit.kotrinth.v2.serializables.tags.GenericTag
+import me.theclashfruit.kotrinth.v2.serializables.tags.LoaderTag
 import org.jetbrains.annotations.ApiStatus.Experimental
 import org.jetbrains.annotations.ApiStatus.Internal
 
@@ -42,6 +48,11 @@ class Kotrinth(appName: String, appVersion: String, appContact: String, customUs
     var rateLimit: Int? = null
     var rateLimitRemaining: Int? = null
     var rateLimitReset: Int? = null
+
+    /**
+     * Modrinth Tags.
+     */
+    val tag = Tags()
 
     init {
         if (customUserAgent != null) {
@@ -356,6 +367,210 @@ class Kotrinth(appName: String, appVersion: String, appContact: String, customUs
         val res: List<Project> = response.body()
 
         return res
+    }
+
+
+    inner class Tags {
+        /**
+         * Get a list of categories.
+         *
+         * @return A list of [me.theclashfruit.kotrinth.v2.serializables.tags.CategoryTag]
+         * @throws [me.theclashfruit.kotrinth.utils.ApiError]
+         */
+        suspend fun category(): List<CategoryTag> {
+            val response: HttpResponse = client.get("$modrinthUrl/tag/category")
+
+            setRateLimits(response)
+
+            if (response.status != HttpStatusCode.OK) {
+                val res: ApiError = response.body()
+
+                throw ApiException(res)
+            }
+
+            val res: List<CategoryTag> = response.body()
+
+            return res
+        }
+
+        /**
+         * Get a list of loaders.
+         *
+         * @return A list of [me.theclashfruit.kotrinth.v2.serializables.tags.LoaderTag]
+         * @throws [me.theclashfruit.kotrinth.utils.ApiError]
+         */
+        suspend fun loader(): List<LoaderTag> {
+            val response: HttpResponse = client.get("$modrinthUrl/tag/loader")
+
+            setRateLimits(response)
+
+            if (response.status != HttpStatusCode.OK) {
+                val res: ApiError = response.body()
+
+                throw ApiException(res)
+            }
+
+            val res: List<LoaderTag> = response.body()
+
+            return res
+        }
+
+        /**
+         * Get a list of game versions.
+         *
+         * @return A list of [me.theclashfruit.kotrinth.v2.serializables.tags.GameVersionTag]
+         * @throws [me.theclashfruit.kotrinth.utils.ApiError]
+         */
+        suspend fun gameVersion(): List<GameVersionTag> {
+            val response: HttpResponse = client.get("$modrinthUrl/tag/game_version")
+
+            setRateLimits(response)
+
+            if (response.status != HttpStatusCode.OK) {
+                val res: ApiError = response.body()
+
+                throw ApiException(res)
+            }
+
+            val res: List<GameVersionTag> = response.body()
+
+            return res
+        }
+
+        /**
+         * Get a list of licenses.
+         *
+         * @return A list of [me.theclashfruit.kotrinth.v2.serializables.tags.GenericTag]
+         * @throws [me.theclashfruit.kotrinth.utils.ApiError]
+         */
+        @Deprecated("Simply use SPDX IDs.")
+        suspend fun license(): List<GenericTag> {
+            val response: HttpResponse = client.get("$modrinthUrl/tag/license")
+
+            setRateLimits(response)
+
+            if (response.status != HttpStatusCode.OK) {
+                val res: ApiError = response.body()
+
+                throw ApiException(res)
+            }
+
+            val res: List<GenericTag> = response.body()
+
+            return res
+        }
+
+        /**
+         * Get a specific license by ID.
+         *
+         * @param id The ID of the license.
+         *
+         * @return [me.theclashfruit.kotrinth.v2.serializables.tags.GenericTag]
+         * @throws [me.theclashfruit.kotrinth.utils.ApiError]
+         */
+        suspend fun license(id: String): GenericTag {
+            val response: HttpResponse = client.get("$modrinthUrl/tag/license/$id")
+
+            setRateLimits(response)
+
+            if (response.status != HttpStatusCode.OK) {
+                val res: ApiError = response.body()
+
+                throw ApiException(res)
+            }
+
+            val res: GenericTag = response.body()
+
+            return res
+        }
+
+        /**
+         * Get a list of donation platforms.
+         *
+         * @return A list of [me.theclashfruit.kotrinth.v2.serializables.tags.GenericTag]
+         * @throws [me.theclashfruit.kotrinth.utils.ApiError]
+         */
+        suspend fun donationPlatform(): List<GenericTag> {
+            val response: HttpResponse = client.get("$modrinthUrl/tag/donation_platform")
+
+            setRateLimits(response)
+
+            if (response.status != HttpStatusCode.OK) {
+                val res: ApiError = response.body()
+
+                throw ApiException(res)
+            }
+
+            val res: List<GenericTag> = response.body()
+
+            return res
+        }
+
+        /**
+         * Get a list of report types.
+         *
+         * @return A list of [String]
+         * @throws [me.theclashfruit.kotrinth.utils.ApiError]
+         */
+        suspend fun reportType(): List<String> {
+            val response: HttpResponse = client.get("$modrinthUrl/tag/report_type")
+
+            setRateLimits(response)
+
+            if (response.status != HttpStatusCode.OK) {
+                val res: ApiError = response.body()
+
+                throw ApiException(res)
+            }
+
+            val res: List<String> = response.body()
+
+            return res
+        }
+
+        /**
+         * Get a list of project types.
+         *
+         * @return A list of [me.theclashfruit.kotrinth.enums.ProjectType]
+         * @throws [me.theclashfruit.kotrinth.utils.ApiError]
+         */
+        suspend fun projectType(): List<ProjectType> {
+            val response: HttpResponse = client.get("$modrinthUrl/tag/project_type")
+
+            setRateLimits(response)
+
+            if (response.status != HttpStatusCode.OK) {
+                val res: ApiError = response.body()
+
+                throw ApiException(res)
+            }
+
+            val res: List<ProjectType> = response.body()
+
+            return res
+        }
+
+        /**
+         * Get a list of sides.
+         *
+         * @return A list of [me.theclashfruit.kotrinth.enums.Side]
+         * @throws [me.theclashfruit.kotrinth.utils.ApiError]
+         */
+        suspend fun sideType(): List<Side> {
+            val response: HttpResponse = client.get("$modrinthUrl/tag/side")
+
+            setRateLimits(response)
+
+            if (response.status != HttpStatusCode.OK) {
+                val res: ApiError = response.body()
+
+                throw ApiException(res)
+            }
+
+            val res: List<Side> = response.body()
+
+            return res
+        }
     }
 
     /**
