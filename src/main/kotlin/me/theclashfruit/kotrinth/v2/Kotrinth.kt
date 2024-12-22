@@ -91,6 +91,7 @@ class Kotrinth(appName: String, appVersion: String, appContact: String, customUs
      * Search for projects on Modrinth.
      *
      * @param query The query to search for.
+     * @param facets The facets to filter by.
      * @param index Sort by.
      * @param offset The offset.
      * @param limit The limit.
@@ -98,7 +99,7 @@ class Kotrinth(appName: String, appVersion: String, appContact: String, customUs
      * @return [me.theclashfruit.kotrinth.v2.serializables.Search]
      * @throws [me.theclashfruit.kotrinth.utils.ApiError]
      */
-    suspend fun search(query: String? = null, index: Sort? = null, offset: Int = 0, limit: Int = 10): Search {
+    suspend fun search(query: String? = null, facets: List<List<String>>? = null, index: Sort? = null, offset: Int = 0, limit: Int = 10): Search {
         val response: HttpResponse = client.get("$modrinthUrl/search") {
             headers {
                 if (token != null) {
@@ -109,6 +110,20 @@ class Kotrinth(appName: String, appVersion: String, appContact: String, customUs
             parameters {
                 append("offset", offset.toString())
                 append("limit", limit.toString())
+
+                if (facets != null) {
+                    append("facets", facets.joinToString(
+                        prefix = "[",
+                        separator = ",",
+                        postfix = "]"
+                    ) {
+                        it.joinToString(
+                            prefix = "[\"",
+                            separator = "\",\"",
+                            postfix = "\"]"
+                        )
+                    })
+                }
 
                 if (query != null) {
                     append("query", query)
