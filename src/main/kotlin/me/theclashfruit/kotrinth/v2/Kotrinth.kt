@@ -2,6 +2,7 @@ package me.theclashfruit.kotrinth.v2
 
 import io.ktor.client.*
 import io.ktor.client.call.*
+import io.ktor.client.engine.android.*
 import io.ktor.client.engine.cio.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
@@ -9,18 +10,17 @@ import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
-import io.ktor.util.*
-import io.ktor.utils.io.core.*
+import io.ktor.utils.io.*
 import me.theclashfruit.kotrinth.enums.Method
-import me.theclashfruit.kotrinth.exceptions.ApiException
 import me.theclashfruit.kotrinth.enums.Sort
+import me.theclashfruit.kotrinth.exceptions.ApiException
+import me.theclashfruit.kotrinth.utils.AndroidUtil.isRunningOnAndroid
 import me.theclashfruit.kotrinth.utils.ApiError
 import me.theclashfruit.kotrinth.v2.serializables.Project
 import me.theclashfruit.kotrinth.v2.serializables.Search
 import me.theclashfruit.kotrinth.v2.serializables.User
 import org.jetbrains.annotations.ApiStatus.Experimental
 import org.jetbrains.annotations.ApiStatus.Internal
-import kotlin.io.use
 
 /**
  * A Kotlin wrapper for the Modrinth API. (Modrinth API v2)
@@ -37,7 +37,7 @@ class Kotrinth(appName: String, appVersion: String, appContact: String, customUs
     private val modrinthUrl = "https://api.modrinth.com/v2"
     private var token: String? = null;
 
-    private val client: HttpClient;
+    internal val client: HttpClient;
 
     var rateLimit: Int? = null
     var rateLimitRemaining: Int? = null
@@ -45,7 +45,7 @@ class Kotrinth(appName: String, appVersion: String, appContact: String, customUs
 
     init {
         if (customUserAgent != null) {
-            this.client = HttpClient(CIO) {
+            this.client = HttpClient(if (isRunningOnAndroid()) Android else CIO) {
                 install(ContentNegotiation) {
                     json()
                 }
@@ -55,7 +55,7 @@ class Kotrinth(appName: String, appVersion: String, appContact: String, customUs
                 }
             }
         } else {
-            this.client = HttpClient(CIO) {
+            this.client = HttpClient(if (isRunningOnAndroid()) Android else CIO) {
                 install(ContentNegotiation) {
                     json()
                 }
@@ -311,7 +311,7 @@ class Kotrinth(appName: String, appVersion: String, appContact: String, customUs
 
         setRateLimits(response)
 
-        if (response.status == HttpStatusCode.NotFound)     return null
+        if (response.status == HttpStatusCode.NotFound) return null
         if (response.status == HttpStatusCode.Unauthorized) return null
 
         if (response.status != HttpStatusCode.OK) {
@@ -344,7 +344,7 @@ class Kotrinth(appName: String, appVersion: String, appContact: String, customUs
 
         setRateLimits(response)
 
-        if (response.status == HttpStatusCode.NotFound)     return null
+        if (response.status == HttpStatusCode.NotFound) return null
         if (response.status == HttpStatusCode.Unauthorized) return null
 
         if (response.status != HttpStatusCode.OK) {
