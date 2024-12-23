@@ -1,6 +1,6 @@
 package me.theclashfruit.kotrinth.utils
 
-object AndroidUtil {
+object PlatformUtil {
     /**
      * Check if the device the code being run on is android.
      *

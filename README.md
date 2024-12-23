@@ -44,7 +44,7 @@ implementation("me.theclashfruit:kotrinth:$version")
 ```kotlin
 package com.example
 
-import me.theclashfruit.kotrinth.v2.Kotrinth
+import me.theclashfruit.kotrinth.Kotrinth
 
 suspend fun main() {
   // Create a new Kotrinth instance.
@@ -55,7 +55,7 @@ suspend fun main() {
   )
   
   // Get a user by their username.
-  val user = kotrinth.user("TheClashFruit")
+  val user = kotrinth.v2.user("TheClashFruit")
   
   // Print the user's id.
   println(user.id)

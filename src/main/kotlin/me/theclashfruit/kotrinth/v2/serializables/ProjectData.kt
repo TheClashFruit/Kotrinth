@@ -9,7 +9,7 @@ import me.theclashfruit.kotrinth.enums.Side
 import me.theclashfruit.kotrinth.enums.Status
 
 @Serializable
-data class Project(
+data class ProjectData(
     val id: String,
     val slug: String,
     val title: String,

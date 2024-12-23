@@ -5,27 +5,28 @@ import io.ktor.client.request.*
 import io.ktor.client.request.forms.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
+import me.theclashfruit.kotrinth.Kotrinth
 import me.theclashfruit.kotrinth.enums.Scope
 import me.theclashfruit.kotrinth.exceptions.ApiException
 import me.theclashfruit.kotrinth.experimental.serializables.TokenResponse
 import me.theclashfruit.kotrinth.utils.ApiError
-import me.theclashfruit.kotrinth.v2.Kotrinth
 import org.jetbrains.annotations.ApiStatus.Experimental
 
 /**
  * Modrinth OAuth
  *
- * @param kotrinth A Kotrinth instance.
+ * @param kotrinth An instance of [me.theclashfruit.kotrinth.Kotrinth].
  * @param clientId OAuth application client id.
  * @param clientSecret OAuth application client secret.
  */
 @Experimental
-class OAuth(kotrinth: Kotrinth, clientId: String, clientSecret: String) {
+class OAuth(
+    kotrinth: Kotrinth,
+
+    private val clientId: String,
+    private val clientSecret: String
+) {
     private val modrinthUrl = "https://api.modrinth.com/_internal"
-
-    private val clientId = clientId
-    private val clientSecret = clientSecret
-
     private val client = kotrinth.client
 
     /**

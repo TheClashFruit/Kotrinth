@@ -6,7 +6,7 @@ import me.theclashfruit.kotrinth.enums.Badge
 import me.theclashfruit.kotrinth.utils.BadgeSerializable
 
 @Serializable
-data class User(
+data class UserData(
     @Serializable(with = BadgeSerializable::class)
     val badges: List<Badge>,
 
