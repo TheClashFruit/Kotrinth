@@ -107,7 +107,7 @@ fun buildConfigClass(configurations: Map<String, String>): String {
 }
 
 val generateBuildConfig by tasks.registering {
-    val outputDir = layout.buildDirectory.dir("generated/source/buildConfig")
+    val outputDir = layout.buildDirectory.dir("generated/source/buildConfig/me/theclashfruit/kotrinth")
 
     outputs.dir(outputDir)
 
