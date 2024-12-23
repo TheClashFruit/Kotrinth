@@ -1,5 +1,6 @@
 package me.theclashfruit.kotrinth
 
+import KotrinthMeta
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.android.*
@@ -70,7 +71,7 @@ class Kotrinth(appName: String, appVersion: String, appContact: String, customUs
                 }
 
                 install(UserAgent) {
-                    agent = "$appName/$appVersion ($appContact) Kotrinth/1.0.0"
+                    agent = "$appName/$appVersion ($appContact) Kotrinth/${KotrinthMeta.VERSION}"
                 }
             }
         }

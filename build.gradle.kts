@@ -24,14 +24,12 @@ val gitHash: String by lazy {
     stdout.toString().trim()
 }
 
-
 group = "me.theclashfruit"
 version = "1.0.0+$gitHash"
 
 repositories {
     mavenCentral()
 }
-
 dependencies {
     testImplementation(kotlin("test"))
 
@@ -43,33 +41,37 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json:3.0.2")
 }
 
-tasks.test {
-    useJUnitPlatform()
-}
-
 kotlin {
     jvmToolchain(17)
 }
-
 java {
     withSourcesJar()
 }
-
 buildscript {
     dependencies {
         classpath("org.jetbrains.dokka:dokka-base:1.9.20")
     }
 }
 
+tasks.test {
+    useJUnitPlatform()
+}
 tasks.build {
     dependsOn(javadocJar)
 }
-
+tasks.compileKotlin {
+    dependsOn(generateBuildConfig)
+}
 tasks.withType<DokkaTask>().configureEach {
+    mustRunAfter(generateBuildConfig)
+
     pluginConfiguration<DokkaBase, DokkaBaseConfiguration> {
         moduleName = "Kotrinth"
         footerMessage = "Copyright &copy; 2024 TheClashFruit &bull; Not affiliated with Modrinth and or Rinth, Inc."
     }
+}
+tasks.named<Jar>("sourcesJar") {
+    mustRunAfter(generateBuildConfig)
 }
 
 val javadocJar by tasks.registering(Jar::class) {
@@ -77,6 +79,52 @@ val javadocJar by tasks.registering(Jar::class) {
 
     from(tasks.dokkaHtml)
 }
+
+fun buildConfigClass(configurations: Map<String, String>): String {
+    val classBuilder = StringBuilder()
+
+    classBuilder.appendLine("// Generated file. Do not edit!")
+    classBuilder.appendLine("")
+    classBuilder.appendLine("/**")
+    classBuilder.appendLine(" * Metadata for Kotrinth.")
+    classBuilder.appendLine(" */")
+
+    classBuilder.appendLine("object KotrinthMeta {")
+
+    configurations.forEach { (name, value) ->
+        classBuilder.appendLine("    /**")
+        classBuilder.appendLine("     * $value")
+        classBuilder.appendLine("     */")
+        classBuilder.appendLine("    const val $name = $value")
+        classBuilder.appendLine("")
+    }
+
+    classBuilder.appendLine("}")
+
+    return classBuilder.toString()
+}
+
+val generateBuildConfig by tasks.registering {
+    val outputDir = layout.buildDirectory.dir("generated/source/buildConfig")
+
+    outputs.dir(outputDir)
+
+    doLast {
+        val outputDirPath = outputDir.get().asFile
+
+        val config = mutableMapOf<String, String>()
+
+        config["GIT_HASH"] = "\"$gitHash\""
+        config["VERSION"] = "\"$version\""
+
+        val buildConfigFile = outputDirPath.resolve("KotrinthMeta.kt")
+
+        buildConfigFile.parentFile.mkdirs()
+        buildConfigFile.writeText(buildConfigClass(config))
+    }
+}
+
+sourceSets["main"].kotlin.srcDirs(layout.buildDirectory.dir("generated/source/buildConfig"))
 
 publishing {
     repositories {
