@@ -85,6 +85,8 @@ fun buildConfigClass(configurations: Map<String, String>): String {
 
     classBuilder.appendLine("// Generated file. Do not edit!")
     classBuilder.appendLine("")
+    classBuilder.appendLine("package me.theclashfruit.kotrinth")
+    classBuilder.appendLine("")
     classBuilder.appendLine("/**")
     classBuilder.appendLine(" * Metadata for Kotrinth.")
     classBuilder.appendLine(" */")
