@@ -131,7 +131,7 @@ sourceSets["main"].kotlin.srcDirs(layout.buildDirectory.dir("generated/source/bu
 publishing {
     repositories {
         maven {
-            name = "theClashFruitSnapshots"
+            name = "tcfSnapshots"
             url = uri("https://mvn.theclashfruit.me/snapshots")
 
             credentials(PasswordCredentials::class)
@@ -142,7 +142,7 @@ publishing {
         }
 
         maven {
-            name = "theClashFruitReleases"
+            name = "tcfReleases"
             url = uri("https://mvn.theclashfruit.me/releases")
 
             credentials(PasswordCredentials::class)
